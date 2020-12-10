@@ -7,7 +7,7 @@ import Text from '../../displayData/Text';
 export const Container = styled(RectButton)`
   width: 100%;
   height: 60px;
-  background: #ff9000;
+  background: ${props => props.theme.colors.accent};
   border-radius: 10px;
 
   justify-content: center;
