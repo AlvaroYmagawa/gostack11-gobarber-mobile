@@ -1,6 +1,15 @@
-import React from 'react';
-import { KeyboardAvoidingView, Platform, View, ScrollView } from 'react-native';
+import React, { useCallback, useRef } from 'react';
+import {
+  KeyboardAvoidingView,
+  Platform,
+  View,
+  ScrollView,
+  Alert,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
+import { useNavigation } from '@react-navigation/native';
+import { Form } from '@unform/mobile';
+import { FormHandles } from '@unform/core';
 
 //* ASSETS
 import logo from '../../assets/logo.png';
@@ -19,6 +28,16 @@ import {
 } from './styles';
 
 const SiginIn: React.FC = () => {
+  const navigation = useNavigation();
+
+  //* REFS
+  const formRef = useRef<FormHandles>(null);
+
+  //* FUNCTIONS
+  const handleSignIn = useCallback(data => {
+    console.log(data);
+  }, []);
+
   return (
     <>
       <KeyboardAvoidingView
@@ -27,29 +46,36 @@ const SiginIn: React.FC = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <ScrollView
-          contentContainerStyle={{ flex: 1 }}
+          contentContainerStyle={{
+            flexGrow: 1,
+            justifyContent: 'center',
+          }}
           keyboardShouldPersistTaps="handled"
         >
-          <Container>
-            <Logo source={logo} />
-            <Title fontType="medium">Faça seu logon</Title>
+          <Form ref={formRef} onSubmit={handleSignIn}>
+            <Container>
+              <Logo source={logo} />
+              <Title fontType="medium">Faça seu logon</Title>
 
-            <Input name="email" icon="mail" placeholder="E-mail" />
+              <Input name="email" icon="mail" placeholder="E-mail" />
 
-            <Input name="password" icon="lock" placeholder="Senha" />
+              <Input name="password" icon="lock" placeholder="Senha" />
 
-            <Button onPress={() => alert('ok')}>Logar</Button>
+              <Button onPress={() => formRef.current?.submitForm()}>
+                Logar
+              </Button>
 
-            <ForgotPassword>
-              <ForgotPasswordText fontType="regular">
-                Esqueci minha senha
-              </ForgotPasswordText>
-            </ForgotPassword>
-          </Container>
+              <ForgotPassword>
+                <ForgotPasswordText fontType="regular">
+                  Esqueci minha senha
+                </ForgotPasswordText>
+              </ForgotPassword>
+            </Container>
+          </Form>
         </ScrollView>
       </KeyboardAvoidingView>
 
-      <CreateAccountButton>
+      <CreateAccountButton onPress={() => navigation.navigate('SignUp')}>
         <Icon name="log-in" size={20} color="#ff9000" />
 
         <CreateAccountButtonText fontType="regular">

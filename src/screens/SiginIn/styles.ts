@@ -18,7 +18,7 @@ export const Logo = styled.Image``;
 export const Title = styled(Text)`
   font-weight: bold;
   font-size: 20px;
-  color: #f4ede8;
+  color: ${props => props.theme.colors.text};
   margin: 64px 0 24px;
 `;
 
@@ -27,18 +27,17 @@ export const ForgotPassword = styled.TouchableOpacity`
 `;
 
 export const ForgotPasswordText = styled(Text)`
-  color: #f4ede8;
+  color: ${props => props.theme.colors.text};
   font-size: 16px;
 `;
 
 export const CreateAccountButton = styled.TouchableOpacity`
-  position: absolute;
-  bottom: 0;
+  margin-top: 16px;
   width: 100%;
   border-top-width: 2px;
-  border-color: #232129;
+  border-color: ${props => props.theme.colors.primary};
   padding: 16px 0 ${16 + getBottomSpace()}px;
-  background: #232129;
+  background: ${props => props.theme.colors.background};
 
   flex-direction: row;
   align-items: center;
