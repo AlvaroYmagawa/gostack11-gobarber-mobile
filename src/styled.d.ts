@@ -9,6 +9,7 @@ declare module 'styled-components' {
       accent: string;
 
       text: string;
+      opaqueText: string;
     };
   }
 }

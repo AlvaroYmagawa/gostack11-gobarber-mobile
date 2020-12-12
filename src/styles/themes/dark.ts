@@ -5,5 +5,6 @@ export default {
     accent: '#ff9000',
 
     text: '#f4ede8',
+    opaqueText: '#666360',
   },
 };

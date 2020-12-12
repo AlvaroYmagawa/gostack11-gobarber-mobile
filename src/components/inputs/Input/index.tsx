@@ -1,6 +1,15 @@
-import React, { useEffect, useRef } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useImperativeHandle,
+  forwardRef,
+  useCallback,
+  useContext,
+} from 'react';
 import { TextInputProps } from 'react-native';
 import { useField } from '@unform/core';
+import { ThemeContext } from 'styled-components';
 
 //* CUSTOM IMPORTS
 import { Container, TextInput, Icon } from './styles';
@@ -14,13 +23,43 @@ interface InputValueReference {
   value: string;
 }
 
-const Input: React.FC<InputProps> = ({ name, icon, ...rest }) => {
+interface InputRef {
+  focus(): void;
+}
+
+const Input: React.ForwardRefRenderFunction<InputRef, InputProps> = (
+  { name, icon, ...rest },
+  ref,
+) => {
+  const { colors } = useContext(ThemeContext);
+
   const inputElementRef = useRef<any>(null);
 
   const { registerField, fieldName, defaultValue, error } = useField(name);
 
   //* REFS
   const inputValueRef = useRef<InputValueReference>({ value: defaultValue });
+
+  //* STATES
+  const [isFocused, setIsFocused] = useState(false);
+  const [isFilled, setIsFilled] = useState(false);
+
+  //* FUNCTIONS
+  const handleInputFocus = useCallback(() => {
+    setIsFocused(true);
+  }, []);
+
+  const handleInputBlur = useCallback(() => {
+    setIsFocused(false);
+
+    setIsFilled(!!inputValueRef.current.value);
+  }, []);
+
+  useImperativeHandle(ref, () => ({
+    focus() {
+      inputElementRef.current.focus();
+    },
+  }));
 
   useEffect(() => {
     registerField({
@@ -39,20 +78,27 @@ const Input: React.FC<InputProps> = ({ name, icon, ...rest }) => {
   }, [fieldName, registerField]);
 
   return (
-    <Container>
-      <Icon name={icon} size={20} color="#666360" />
+    <Container isFocused={isFocused}>
+      <Icon
+        name={icon}
+        size={20}
+        color={isFocused || isFilled ? colors.accent : colors.opaqueText}
+      />
 
       <TextInput
+        ref={inputElementRef}
         onChangeText={value => {
           inputValueRef.current.value = value;
         }}
+        onFocus={handleInputFocus}
+        onBlur={handleInputBlur}
         defaultValue={defaultValue}
         keyboardAppearance="dark"
-        placeholderTextColor="#666360"
+        placeholderTextColor={colors.opaqueText}
         {...rest}
       />
     </Container>
   );
 };
 
-export default Input;
+export default forwardRef(Input);

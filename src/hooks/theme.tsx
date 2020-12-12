@@ -9,6 +9,9 @@ interface ThemeContextData {
       background: string;
       primary: string;
       accent: string;
+
+      text: string;
+      opaqueText: string;
     };
   };
 }
