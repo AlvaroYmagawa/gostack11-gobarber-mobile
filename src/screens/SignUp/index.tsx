@@ -4,17 +4,20 @@ import {
   Platform,
   ScrollView,
   TextInput,
+  Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import { ThemeContext } from 'styled-components';
 import { useNavigation } from '@react-navigation/native';
 import { Form } from '@unform/mobile';
 import { FormHandles } from '@unform/core';
+import * as Yup from 'yup';
 
 //* ASSETS
 import logo from '../../assets/logo.png';
 
 //* CUSTOM IMPORTS
+import getValidationErrors from '../../utils/getValidationErrors';
 import Input from '../../components/inputs/Input';
 import Button from '../../components/inputs/Button';
 import {
@@ -24,6 +27,12 @@ import {
   BackToSignInText,
   Logo,
 } from './styles';
+
+interface SignUpFormData {
+  password: string;
+  name: string;
+  email: string;
+}
 
 const SignUp: React.FC = () => {
   const navigation = useNavigation();
@@ -35,8 +44,33 @@ const SignUp: React.FC = () => {
   const passwordInputRef = useRef<TextInput>(null);
 
   //* FUNCTIONS
-  const handleSubmit = useCallback(data => {
-    console.log(data);
+  const handleSignUp = useCallback(async (data: SignUpFormData) => {
+    try {
+      formRef.current?.setErrors({});
+
+      const schema = Yup.object().shape({
+        email: Yup.string()
+          .email('Email inválido')
+          .required('Email é obrigatório'),
+        name: Yup.string().required('Nome é obrigatório'),
+        password: Yup.string().required('Senha obrigatória'),
+      });
+
+      await schema.validate(data, {
+        abortEarly: false,
+      });
+    } catch (err) {
+      if (err instanceof Yup.ValidationError) {
+        const errors = getValidationErrors(err);
+
+        formRef.current?.setErrors(errors);
+      }
+
+      Alert.alert(
+        'Erro na autenticação',
+        'Ocorreu um erro ao fazer login, cheque as credenciais',
+      );
+    }
   }, []);
 
   return (
@@ -53,7 +87,7 @@ const SignUp: React.FC = () => {
           }}
           keyboardShouldPersistTaps="handled"
         >
-          <Form ref={formRef} onSubmit={handleSubmit}>
+          <Form ref={formRef} onSubmit={handleSignUp}>
             <Container>
               <Logo source={logo} />
               <Title fontType="medium">Crie sua conta</Title>

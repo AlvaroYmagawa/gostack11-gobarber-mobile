@@ -77,13 +77,17 @@ const Input: React.ForwardRefRenderFunction<InputRef, InputProps> = (
     });
   }, [fieldName, registerField]);
 
+  const renderIconColor = () => {
+    if (isFocused || isFilled) return colors.accent;
+
+    if (error) return '#c53030';
+
+    return colors.opaqueText;
+  };
+
   return (
-    <Container isFocused={isFocused}>
-      <Icon
-        name={icon}
-        size={20}
-        color={isFocused || isFilled ? colors.accent : colors.opaqueText}
-      />
+    <Container isFocused={isFocused} isErrored={!!error}>
+      <Icon name={icon} size={20} color={renderIconColor()} />
 
       <TextInput
         ref={inputElementRef}

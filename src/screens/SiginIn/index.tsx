@@ -4,16 +4,19 @@ import {
   Platform,
   TextInput,
   ScrollView,
+  Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import { useNavigation } from '@react-navigation/native';
 import { Form } from '@unform/mobile';
 import { FormHandles } from '@unform/core';
+import * as Yup from 'yup';
 
 //* ASSETS
 import logo from '../../assets/logo.png';
 
 //* CUSTOM IMPORTS
+import getValidationErrors from '../../utils/getValidationErrors';
 import Input from '../../components/inputs/Input';
 import Button from '../../components/inputs/Button';
 import {
@@ -26,6 +29,11 @@ import {
   CreateAccountButtonText,
 } from './styles';
 
+interface SignInFormData {
+  email: string;
+  password: string;
+}
+
 const SiginIn: React.FC = () => {
   const navigation = useNavigation();
 
@@ -34,8 +42,32 @@ const SiginIn: React.FC = () => {
   const passwordInputRef = useRef<TextInput>(null);
 
   //* FUNCTIONS
-  const handleSignIn = useCallback(data => {
-    console.log(data);
+  const handleSignIn = useCallback(async (data: SignInFormData) => {
+    try {
+      formRef.current?.setErrors({});
+
+      const schema = Yup.object().shape({
+        email: Yup.string()
+          .email('Email inválido')
+          .required('Email é obrigatório'),
+        name: Yup.string().required('Nome é obrigatório'),
+      });
+
+      await schema.validate(data, {
+        abortEarly: false,
+      });
+    } catch (err) {
+      if (err instanceof Yup.ValidationError) {
+        const errors = getValidationErrors(err);
+
+        formRef.current?.setErrors(errors);
+      }
+
+      Alert.alert(
+        'Erro na autenticação',
+        'Ocorreu um erro ao fazer login, cheque as credenciais',
+      );
+    }
   }, []);
 
   return (
