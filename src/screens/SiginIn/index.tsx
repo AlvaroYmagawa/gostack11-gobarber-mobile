@@ -12,6 +12,9 @@ import { Form } from '@unform/mobile';
 import { FormHandles } from '@unform/core';
 import * as Yup from 'yup';
 
+//* HOOKS
+import { useAuth } from '../../hooks/auth';
+
 //* ASSETS
 import logo from '../../assets/logo.png';
 
@@ -37,6 +40,8 @@ interface SignInFormData {
 const SiginIn: React.FC = () => {
   const navigation = useNavigation();
 
+  const { signIn } = useAuth();
+
   //* REFS
   const formRef = useRef<FormHandles>(null);
   const passwordInputRef = useRef<TextInput>(null);
@@ -50,12 +55,14 @@ const SiginIn: React.FC = () => {
         email: Yup.string()
           .email('Email inválido')
           .required('Email é obrigatório'),
-        name: Yup.string().required('Nome é obrigatório'),
+        password: Yup.string().required('Senha obrigatória'),
       });
 
       await schema.validate(data, {
         abortEarly: false,
       });
+
+      signIn(data);
     } catch (err) {
       if (err instanceof Yup.ValidationError) {
         const errors = getValidationErrors(err);
