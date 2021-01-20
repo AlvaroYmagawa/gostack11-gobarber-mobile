@@ -21,6 +21,7 @@ interface AuthContextData {
   user: IUser;
   signIn(credentials: SignInCredentials): Promise<void>;
   signOut(): Promise<void>;
+  isLoading: boolean;
 }
 
 interface AuthState {
@@ -35,6 +36,7 @@ const INITIAL_STATE = {} as AuthState;
 const AuthProvider: React.FC = ({ children }) => {
   //* STATES
   const [data, setData] = useState<AuthState>(INITIAL_STATE);
+  const [isLoading, setIsLoading] = React.useState(true);
 
   //* FUNCTIONS
   useEffect(() => {
@@ -49,6 +51,8 @@ const AuthProvider: React.FC = ({ children }) => {
 
       if (tokenValue && userValue)
         setData({ token: tokenValue, user: userValue });
+
+      setIsLoading(false);
     };
 
     loadStorageData();
@@ -74,7 +78,9 @@ const AuthProvider: React.FC = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user: data.user, signIn, signOut }}>
+    <AuthContext.Provider
+      value={{ user: data.user, signIn, signOut, isLoading }}
+    >
       {children}
     </AuthContext.Provider>
   );
